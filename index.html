@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>생태 & 환경 퀴즈 — 초등학생용</title>
+<style>
+  :root{
+    --taegeuk-red: #C0342A;
+    --taegeuk-blue: #1C5CC0;
+    --taegeuk-black: #111111;
+    --bg-white: #FBFBFA;
+    --accent: #F2C94C;
+    --glass: rgba(255,255,255,0.75);
+    --shadow: 0 8px 24px rgba(17,17,17,0.12);
+  }
+
+  /* 전체 레이아웃 */
+  html,body{
+    height:100%;
+    margin:0;
+    font-family: "Malgun Gothic", "Noto Sans KR", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: var(--bg-white);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* 전통 무늬 SVG를 배경으로 반복 */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image: url('data:image/svg+xml;utf8,\
+      <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">\
+      <defs>\
+        <pattern id="pattern" width="120" height="120" patternUnits="userSpaceOnUse">\
+          <rect width="120" height="120" fill="%23FBFBFA"/>\
+          <g opacity="0.06" fill="%23000">\
+            <circle cx="20" cy="20" r="8"/>\
+            <circle cx="100" cy="100" r="8"/>\
+            <path d="M0 60 Q20 50 40 60 T80 60 T120 60" stroke="%23000" fill="none" stroke-width="1"/>\
+            <path d="M60 0 Q50 20 60 40 T60 80 T60 120" stroke="%23000" fill="none" stroke-width="1"/>\
+          </g>\
+        </pattern>\
+      </defs>\
+      <rect width="100%" height="100%" fill="url(%23pattern)"/>\
+      </svg>');
+    background-repeat: repeat;
+    z-index: -2;
+  }
+
+  /* 반투명 중앙 카드로 구성 (화면 꽉차게 가운데 배치) */
+  .wrap{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px;
+    box-sizing:border-box;
+    gap:20px;
+  }
+
+  .card{
+    width:100%;
+    max-width:1100px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(250,250,250,0.86));
+    border-radius:18px;
+    box-shadow: var(--shadow);
+    overflow:hidden;
+    display:grid;
+    grid-template-columns: 360px 1fr;
+    min-height:600px;
+  }
+
+  /* 왼쪽 사이드: 태극 문양 + 정보 */
+  .side{
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02)),
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 18px);
+    padding:28px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    align-items:center;
+    justify-content:flex-start;
+    border-right:1px solid rgba(0,0,0,0.04);
+  }
+
+  .taegeuk{
+    width:160px;
+    height:160px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.05));
+    box-shadow: 0 8px 24px rgba(17,17,17,0.08);
+  }
+
+  .title{
+    text-align:center;
+    font-weight:700;
+    font-size:20px;
+    color:var(--taegeuk-black);
+    margin-top:6px;
+  }
+  .subtitle{
+    font-size:13px;
+    color:rgba(0,0,0,0.6);
+    text-align:center;
+  }
+
+  /* 진행/점수 표시 */
+  .meta{
+    width:100%;
+    margin-top:12px;
+  }
+  .progress{
+    height:12px;
+    background:rgba(0,0,0,0.06);
+    border-radius:20px;
+    overflow:hidden;
+  }
+  .progress > i{
+    display:block;
+    height:100%;
+    width:0%;
+    background: linear-gradient(90deg, var(--taegeuk-red), var(--taegeuk-blue));
+    transition: width .4s ease;
+  }
+  .score{
+    margin-top:10px;
+    display:flex;
+    justify-content:space-between;
+    font-weight:600;
+    color:var(--taegeuk-black);
+  }
+
+  /* 오른쪽: 퀴즈 영역 */
+  .main{
+    padding:34px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+
+  .qbox{
+    display:flex;
+    gap:16px;
+    align-items:flex-start;
+  }
+  .qnum{
+    width:62px;
+    height:62px;
+    flex-shrink:0;
+    background:conic-gradient(from 180deg at 50% 50%, var(--taegeuk-red) 0 50%, var(--taegeuk-blue) 50% 100%);
+    color:white;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-size:18px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  }
+  .qtext{
+    font-size:20px;
+    font-weight:700;
+    color:var(--taegeuk-black);
+  }
+
+  .options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-top:6px;
+  }
+  .opt{
+    background:var(--glass);
+    border-radius:12px;
+    padding:12px 14px;
+    cursor:pointer;
+    border:2px solid transparent;
+    font-weight:700;
+    transition: transform .08s ease, border-color .12s ease, box-shadow .12s ease;
+    user-select:none;
+  }
+  .opt:hover{ transform:translateY(-4px); box-shadow:0 10px 20px rgba(0,0,0,0.06);}
+  .opt.selected{ border-color:rgba(0,0,0,0.08); box-shadow:0 6px 14px rgba(0,0,0,0.06); }
+  .opt.correct{ background: linear-gradient(90deg, rgba(28,92,192,0.12), rgba(192,52,42,0.06)); border-color: rgba(28,92,192,0.18);}
+  .opt.wrong{ opacity:0.7; filter:grayscale(.2); border-color: rgba(200,50,50,0.12);}
+
+  .controls{
+    margin-top:auto;
+    display:flex;
+    gap:12px;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  .btn{
+    border:0;
+    padding:12px 18px;
+    border-radius:12px;
+    font-weight:800;
+    letter-spacing:0.6px;
+    cursor:pointer;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    transition: transform .08s ease, box-shadow .12s ease;
+  }
+  .btn:active{ transform:translateY(2px); }
+  .btn-primary{
+    background: linear-gradient(90deg, var(--taegeuk-red), var(--taegeuk-blue));
+    color:white;
+  }
+  .btn-ghost{
+    background:transparent;
+    border:2px solid rgba(0,0,0,0.06);
+    color:var(--taegeuk-black);
+  }
+
+  .hint{
+    font-size:13px;
+    color:rgba(0,0,0,0.55);
+    margin-top:6px;
+  }
+
+  .result{
+    text-align:center;
+    padding:28px;
+    border-radius:12px;
+    background:linear-gradient(180deg, rgba(240,240,240,0.6), rgba(255,255,255,0.6));
+    box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+  }
+
+  /* 작은 화면 처리 */
+  @media (max-width:900px){
+    .card{ grid-template-columns: 1fr; max-width:920px; }
+    .side{ order:2; flex-direction:row; justify-content:space-between; padding:18px; gap:12px; border-right:none; border-top:1px solid rgba(0,0,0,0.04);}
+    .main{ order:1; padding:18px; }
+    .taegeuk{ width:110px; height:110px; }
+    .qtext{ font-size:18px; }
+    .options{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" role="application" aria-labelledby="appTitle">
+    <aside class="side" aria-hidden="false">
+      <div class="taegeuk" aria-hidden="true">
+        <!-- 간단한 태극 모양 SVG -->
+        <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="태극">
+          <defs>
+            <clipPath id="c"><circle cx="60" cy="60" r="56"/></clipPath>
+          </defs>
+          <rect width="120" height="120" rx="60" fill="white"/>
+          <g clip-path="url(#c)">
+            <path d="M60 4 a56 56 0 1 0 0 112 a28 28 0 1 1 0-56 a28 28 0 1 0 0-56" fill="#C0342A"/>
+            <path d="M60 4 a56 56 0 1 1 0 112 a28 28 0 1 0 0-56 a28 28 0 1 1 0-56" fill="#1C5CC0"/>
+            <circle cx="60" cy="36" r="10" fill="#1C5CC0"/>
+            <circle cx="60" cy="84" r="10" fill="#C0342A"/>
+            <g fill="#111">
+              <rect x="10" y="10" width="8" height="4" rx="2" transform="rotate(0 14 12)"/>
+              <rect x="10" y="20" width="8" height="4" rx="2" transform="rotate(0 14 22)"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <div class="title" id="appTitle">생태 & 환경 퀴즈</div>
+      <div class="subtitle">초등학생 수준 • 10문제 • 태극기 색감</div>
+
+      <div class="meta">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-weight:700;color:rgba(0,0,0,0.7)">
+          <div>진행</div>
+          <div id="progText">0 / 10</div>
+        </div>
+        <div class="progress" aria-hidden="true" style="margin-top:8px">
+          <i id="progressBar"></i>
+        </div>
+        <div class="score">
+          <div>점수: <span id="score">0</span></div>
+          <div id="feedback" style="color:rgba(0,0,0,0.45);font-weight:600;">화이팅!</div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;width:100%;display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-primary" id="nextBtn">문제 시작</button>
+        <button class="btn btn-ghost" id="restartBtn" style="display:none">다시 풀기</button>
+        <div style="font-size:12px;color:rgba(0,0,0,0.55);text-align:center;margin-top:8px;">
+          간단한 설명은 각 문제에서 바로 보여줍니다.
+        </div>
+      </div>
+
+    </aside>
+
+    <main class="main" role="main">
+      <div id="quizArea">
+        <!-- 질문 영역이 script로 채워짐 -->
+        <div class="qbox" style="opacity:0.35">
+          <div class="qnum">1</div>
+          <div>
+            <div class="qtext">문제가 여기에 표시됩니다.</div>
+            <div class="hint">힌트나 설명이 여기 표시됩니다.</div>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="options" id="optionsArea">
+          <!-- 옵션들 -->
+        </div>
+
+        <div class="controls">
+          <div style="font-size:13px;color:rgba(0,0,0,0.6)">빠르게 풀고 친환경을 배워봐요 🌱</div>
+          <div style="display:flex;gap:10px;">
+            <button id="checkBtn" class="btn btn-ghost" disabled>정답 확인</button>
+            <button id="nextQBtn" class="btn btn-primary" style="display:none">다음 문제 →</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="resultArea" style="display:none">
+        <div class="result">
+          <h2 id="resultTitle" style="margin:6px 0 10px 0">완료!</h2>
+          <p id="resultText" style="margin:0 0 18px 0;color:rgba(0,0,0,0.7)"></p>
+          <div style="display:flex;gap:10px;justify-content:center;">
+            <button id="retryBtn" class="btn btn-primary">다시 풀기</button>
+            <button id="reviewBtn" class="btn btn-ghost">문제 다시 보기</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+/*
+  초등학생 난이도의 10문제 퀴즈 데이터
+  각 항목: {q, options:[], a: 정답 인덱스, explain: 설명}
+*/
+const quiz = [
+  { q: "플라스틱을 재활용할 때 가장 먼저 해야 하는 일은 무엇일까요?",
+    options: ["그냥 버리기","깨끗이 씻어서 분리배출하기","불에 태우기","먹는다"],
+    a: 1,
+    explain: "음식물이 붙은 플라스틱은 재활용하기 어렵습니다. 물로 깨끗이 씻어 분리 배출해야 해요."},
+
+  { q: "나무가 많은 숲은 어떤 역할을 하나요?",
+    options: ["공기를 더럽힌다","이산화탄소를 흡수하고 산소를 만든다","물의 색을 바꾼다","해가 지지 않게 만든다"],
+    a: 1,
+    explain: "나무는 이산화탄소를 흡수하고 산소를 만들어 우리에게 깨끗한 공기를 줍니다."},
+
+  { q: "물이 순환하는 과정을 무엇이라고 하나요?",
+    options: ["물 순환", "물결", "물전달", "물전기"],
+    a: 0,
+    explain: "비가 내리고, 강과 바다에서 증발해 구름이 되었다가 다시 비로 내리는 과정을 물 순환(물의 순환)이라고 합니다."},
+
+  { q: "다음 중 멸종 위기에 처한 동물을 보호하려면 무엇을 해야 할까요?",
+    options: ["서식지를 파괴한다","사람들이 들어가지 못하게 지킨다","더 많이 잡는다","먹이를 뺏는다"],
+    a: 1,
+    explain: "서식지를 지키고 불법 사냥을 막는 것이 멸종 위기 동물을 보호하는 방법입니다."},
+
+  { q: "전기를 적게 쓰는 좋은 습관은?",
+    options: ["불 필요할 때 끄기","계속 켜놓기","전기를 낭비하는 것","전기선을 끊는다"],
+    a: 0,
+    explain: "사용하지 않는 전등이나 전자기기는 꺼서 에너지를 절약합시다."},
+
+  { q: "음식물 쓰레기를 줄이는 방법으로 알맞은 것은?",
+    options: ["많이 남겨두기","꼭 필요한 만큼만 먹거나 남은 음식은 재활용(퇴비)하기","다 버리기","모두 태우기"],
+    a: 1,
+    explain: "필요한 만큼만 먹고 남은 음식은 퇴비로 만들면 쓰레기를 줄일 수 있어요."},
+
+  { q: "공장이나 자동차에서 나오는 연기, 매연 등은 무엇이라 하나요?",
+    options: ["공기정화","오염물질","깨끗한 공기","비타민"],
+    a: 1,
+    explain: "공기 중에 나쁜 물질이 섞이면 공기가 오염됩니다. 이를 오염물질이라고 해요."},
+
+  { q: "바다에 플라스틱이 많아지면 어떻게 되나요?",
+    options: ["물고기들이 플라스틱을 먹어서 해로울 수 있다","물고기가 더 건강해진다","바다가 더 맑아진다","바다가 뜨거워진다"],
+    a: 0,
+    explain: "플라스틱을 먹은 물고기는 아프고, 결국 우리 식탁에도 영향을 줄 수 있어요."},
+
+  { q: "햇빛을 이용해 전기를 만드는 방법은 무엇인가요?",
+    options: ["태양광(솔라) 발전","바람기계 발전","석탄 발전","물고기 발전"],
+    a: 0,
+    explain: "태양광 발전은 태양빛을 이용해 전기를 만드는 친환경 기술이에요."},
+
+  { q: "생물다양성(여러 종류의 동식물)이 중요한 이유는?",
+    options: ["자연이 더 건강하고 안정적이 된다","자연이 망가진다","더 더워진다","모두 똑같아진다"],
+    a: 0,
+    explain: "많은 종류의 동식물이 있을수록 생태계가 건강하고 변화를 잘 견딜 수 있어요."}
+];
+
+let current = -1;
+let score = 0;
+let answered = false;
+
+const qnumEl = document.querySelector('.qnum');
+const qtextEl = document.querySelector('.qtext');
+const optionsArea = document.getElementById('optionsArea');
+const progressBar = document.getElementById('progressBar');
+const progText = document.getElementById('progText');
+const scoreEl = document.getElementById('score');
+const feedbackEl = document.getElementById('feedback');
+const nextBtn = document.getElementById('nextBtn');
+const checkBtn = document.getElementById('checkBtn');
+const nextQBtn = document.getElementById('nextQBtn');
+const restartBtn = document.getElementById('restartBtn');
+const resultArea = document.getElementById('resultArea');
+const quizArea = document.getElementById('quizArea');
+const resultTitle = document.getElementById('resultTitle');
+const resultText = document.getElementById('resultText');
+const retryBtn = document.getElementById('retryBtn');
+const reviewBtn = document.getElementById('reviewBtn');
+const progBarText = document.getElementById('progText');
+
+function startQuiz(){
+  current = 0;
+  score = 0;
+  updateMeta();
+  nextBtn.style.display = 'none';
+  restartBtn.style.display = 'none';
+  resultArea.style.display = 'none';
+  quizArea.style.display = 'block';
+  renderQuestion();
+}
+
+function updateMeta(){
+  progText.textContent = (Math.min(Math.max(current+1,0), quiz.length)) + " / " + quiz.length;
+  const pct = ((Math.max(current,0)) / quiz.length) * 100;
+  progressBar.style.width = pct + "%";
+  scoreEl.textContent = score;
+  // feedback
+  feedbackEl.textContent = score >= (quiz.length/2) ? "잘하고 있어요!" : "천천히 해봐요!";
+}
+
+function renderQuestion(){
+  answered = false;
+  checkBtn.disabled = true;
+  nextQBtn.style.display = 'none';
+
+  if(current < 0) current = 0;
+  if(current >= quiz.length){
+    finishQuiz();
+    return;
+  }
+
+  const item = quiz[current];
+  // update left index number and text
+  qnumEl.textContent = (current+1);
+  qtextEl.textContent = item.q;
+
+  // build options
+  optionsArea.innerHTML = '';
+  item.options.forEach((opt, idx) => {
+    const div = document.createElement('div');
+    div.className = 'opt';
+    div.setAttribute('role','button');
+    div.setAttribute('tabindex','0');
+    div.dataset.index = idx;
+    div.innerText = opt;
+    div.addEventListener('click', () => selectOption(div));
+    div.addEventListener('keypress', (e) => { if(e.key === 'Enter') selectOption(div); });
+    optionsArea.appendChild(div);
+  });
+
+  // hint area
+  const hintEl = document.querySelector('.hint');
+  hintEl.textContent = "선택 후 '정답 확인'을 눌러보세요.";
+  updateMeta();
+}
+
+function selectOption(el){
+  if(answered) return;
+  // remove previous selected
+  const prev = document.querySelector('.opt.selected');
+  if(prev) prev.classList.remove('selected');
+  el.classList.add('selected');
+  checkBtn.disabled = false;
+}
+
+checkBtn.addEventListener('click', () => {
+  if(answered) return;
+  const sel = document.querySelector('.opt.selected');
+  if(!sel) return;
+  answered = true;
+  const chosen = Number(sel.dataset.index);
+  const correct = quiz[current].a;
+
+  // mark correct/incorrect
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach(o => {
+    const idx = Number(o.dataset.index);
+    if(idx === correct){
+      o.classList.add('correct');
+    }
+    if(idx === chosen && idx !== correct){
+      o.classList.add('wrong');
+    }
+    o.classList.remove('selected');
+    o.style.cursor = 'default';
+  });
+
+  // score
+  if(chosen === correct){
+    score += 10; // 각 문제 10점
+    scoreEl.textContent = score;
+  }
+
+  // show explanation as hint
+  const hintEl = document.querySelector('.hint');
+  hintEl.textContent = quiz[current].explain;
+
+  // show next button or finish
+  if(current < quiz.length - 1){
+    nextQBtn.style.display = 'inline-block';
+  } else {
+    // 마지막 문제
+    nextQBtn.style.display = 'inline-block';
+    nextQBtn.textContent = '결과 보기';
+  }
+
+  updateMeta();
+});
+
+nextQBtn.addEventListener('click', () => {
+  // advance
+  current++;
+  if(current < quiz.length){
+    qnumEl.classList.remove('pulse');
+    renderQuestion();
+  } else {
+    finishQuiz();
+  }
+});
+
+function finishQuiz(){
+  quizArea.style.display = 'none';
+  resultArea.style.display = 'block';
+  resultTitle.textContent = "모두 완료했어요!";
+  resultText.textContent = `총 점수: ${score}점 / ${quiz.length*10}점\n` + 
+    (score === quiz.length*10 ? "완벽해요! 환경지킴이 👏" : (score >= (quiz.length*10*0.7) ? "정말 잘했어요! 조금만 더 공부해요." : "다시 풀어보면 더 잘할 수 있어요!"));
+  progressBar.style.width = "100%";
+  progText.textContent = quiz.length + " / " + quiz.length;
+  restartBtn.style.display = 'inline-block';
+}
+
+restartBtn.addEventListener('click', startQuiz);
+retryBtn.addEventListener('click', startQuiz);
+
+nextBtn.addEventListener('click', startQuiz);
+
+reviewBtn.addEventListener('click', () => {
+  // 간단 리포트: 문제와 정답을 보여주는 모달 대체
+  const review = quiz.map((it, i) => `${i+1}. ${it.q}\n정답: ${it.options[it.a]}\n설명: ${it.explain}`).join("\n\n");
+  // 새창으로 열어 보여주기
+  const w = window.open("", "_blank");
+  w.document.title = "퀴즈 복습";
+  const pre = w.document.createElement('pre');
+  pre.style.whiteSpace = 'pre-wrap';
+  pre.style.fontSize = '16px';
+  pre.style.lineHeight = '1.6';
+  pre.textContent = review;
+  w.document.body.appendChild(pre);
+});
+
+// 초기 로드: progress 0
+progText.textContent = "0 / " + quiz.length;
+progressBar.style.width = "0%";
+scoreEl.textContent = "0";
+
+// 키보드 네비: Enter로 정답확인, N으로 다음
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter'){
+    if(!quizArea.style.display || quizArea.style.display !== 'none'){
+      if(!checkBtn.disabled) checkBtn.click();
+      else if(nextQBtn.style.display !== 'none') nextQBtn.click();
+    }
+  }
+  if(e.key.toLowerCase() === 'n'){
+    if(nextQBtn.style.display !== 'none') nextQBtn.click();
+  }
+});
+</script>
+</body>
+</html>
